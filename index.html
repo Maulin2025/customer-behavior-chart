@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Behavior Tree Diagram</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- D3.js CDN -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        /* Custom styles for the tree chart */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+        }
+        .chart-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            max-width: 1200px;
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin: 2rem;
+        }
+        .tree-svg {
+            width: 100%;
+            /* Set an initial max-height, adjust dynamically if needed */
+            max-height: 800px;
+            display: block;
+            margin: 0 auto;
+            overflow: visible; /* Allows content outside viewBox for labels */
+        }
+
+        .node circle {
+            fill: #fff;
+            stroke: steelblue;
+            stroke-width: 3px;
+            cursor: pointer;
+            transition: fill 0.2s ease-in-out, stroke 0.2s ease-in-out;
+        }
+
+        .node text {
+            font: 12px sans-serif;
+            fill: #333;
+            pointer-events: none; /* Make text not interfere with circle interaction */
+        }
+
+        .link {
+            fill: none;
+            stroke: #ccc;
+            stroke-width: 1.5px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            margin-right: 0.75rem;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        .tooltip {
+            position: absolute;
+            text-align: center;
+            padding: 8px;
+            background: #333;
+            color: #fff;
+            border-radius: 6px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            font-size: 0.85rem;
+            z-index: 1000;
+        }
+        .download-buttons {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            width: 100%;
+        }
+        .download-button {
+            padding: 0.75rem 1.5rem;
+            background-color: #1a73e8;
+            color: white;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .download-button:hover {
+            background-color: #1558b0;
+            transform: translateY(-2px);
+        }
+        .download-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .ai-insight-box {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background-color: #e0f2f7; /* Light blue background for AI insights */
+            border-radius: 8px;
+            border: 1px solid #b3e5fc;
+            width: 100%;
+            text-align: left;
+            font-size: 0.95rem;
+            color: #263238;
+            min-height: 50px; /* Ensure visibility */
+        }
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="chart-container rounded-xl">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Customer Behavior Hierarchy (Collapsible Tree)</h1>
+        <div class="flex flex-col md:flex-row items-center md:items-start w-full">
+            <div id="chart" class="flex-grow flex items-center justify-center p-4">
+                <svg class="tree-svg"></svg>
+            </div>
+            <div class="legend p-4 md:ml-8 mt-6 md:mt-0 bg-gray-50 rounded-lg shadow-inner">
+                <h2 class="text-xl font-semibold text-gray-700 mb-4">Behavior Legend</h2>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #4CAF50;"></div>
+                    <span>Brand Loyal</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #F44336;"></div>
+                    <span>Frequent Brand Switcher</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #FFC107;"></div>
+                    <span>Brand Switcher</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #9E9E9E;"></div>
+                    <span>Insufficient Data</span>
+                </div>
+                 <div class="legend-item">
+                    <div class="legend-color" style="background-color: #2196F3;"></div>
+                    <span>Category Explorer (General)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #E53935;"></div>
+                    <span>Frequent Brand Switcher (Overall Customer)</span>
+                </div>
+                 <div class="legend-item">
+                    <div class="legend-color" style="background-color: #3182CE; border-color: steelblue;"></div>
+                    <span>Node (Click to Toggle)</span>
+                </div>
+            </div>
+        </div>
+        <div class="download-buttons">
+            <button class="download-button" onclick="downloadChartAsImage('png')">Download as PNG</button>
+            <button class="download-button" onclick="downloadChartAsImage('jpeg')">Download as JPG</button>
+            <button class="download-button" onclick="getLLMInsight()">✨ Get AI Insight ✨</button>
+        </div>
+        <div id="aiInsightOutput" class="ai-insight-box">
+            Click "✨ Get AI Insight ✨" to get a summary of this customer's behavior and actionable suggestions.
+        </div>
+    </div>
+
+    <script>
+        // Sample customer data (replace with your actual data source)
+        const rawData = [
+            { customer_id: 6877209886958, customer_brand_persona: 'Frequent Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Food', category_behavior_label: 'Frequent Brand Switcher', sub_category: 'Treats', subcat_behavior_label: 'Brand Switcher', subcat_behavior_readable: 'Multiple Brands - Treats - Brand Switcher' },
+            { customer_id: 6877209886958, customer_brand_persona: 'Frequent Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Rewards', category_behavior_label: 'Brand Switcher', sub_category: 'Wet Food', subcat_behavior_label: 'Insufficient Data', subcat_behavior_readable: 'Single Order - Wet Food - Insufficient Data' },
+            { customer_id: 6877209886958, customer_brand_persona: 'Frequent Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Non-Food', category_behavior_label: 'Brand Switcher', sub_category: 'Toys', subcat_behavior_label: 'Brand Switcher', subcat_behavior_readable: 'Multiple Brands - Toys - Brand Switcher' },
+            { customer_id: 6877209886958, customer_brand_persona: 'Frequent Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Non-Food', category_behavior_label: 'Brand Switcher', sub_category: 'Clothing & Accessories', subcat_behavior_label: 'Insufficient Data', subcat_behavior_readable: 'Single Order - Clothing & Accessories - Insufficient Data' },
+            { customer_id: 6877209886958, customer_brand_persona: 'Frequent Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Food', category_behavior_label: 'Frequent Brand Switcher', sub_category: 'Dry Food', subcat_behavior_label: 'Frequent Brand Switcher', subcat_behavior_readable: 'Multiple Brands - Dry Food - Frequent Brand Switcher' },
+            { customer_id: 6877209886958, customer_brand_persona: 'Frequent Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Non-Food', category_behavior_label: 'Brand Switcher', sub_category: 'Grooming Supplies', subcat_behavior_label: 'Brand Switcher', subcat_behavior_readable: 'Multiple Brands - Grooming Supplies - Brand Switcher' },
+            { customer_id: 6877209886958, customer_brand_persona: 'Frequent Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Non-Food', category_behavior_label: 'Brand Switcher', sub_category: 'Health & Wellness', subcat_behavior_label: 'Brand Switcher', subcat_behavior_readable: 'Multiple Brands - Health & Wellness - Brand Switcher' },
+            { customer_id: 6877209886958, customer_brand_persona: 'Frequent Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Non-Food', category_behavior_label: 'Brand Switcher', sub_category: 'Bowls & Feeders', subcat_behavior_label: 'Insufficient Data', subcat_behavior_readable: 'Single Order - Bowls & Feeders - Insufficient Data' },
+            { customer_id: 6877209886958, customer_brand_persona: 'Frequent Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Food', category_behavior_label: 'Frequent Brand Switcher', sub_category: 'Wet Food', subcat_behavior_label: 'Brand Switcher', subcat_behavior_readable: 'Multiple Brands - Wet Food - Brand Switcher' },
+            { customer_id: 6877209886958, customer_brand_persona: 'Frequent Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Services', category_behavior_label: 'Brand Loyal', sub_category: 'Services', subcat_behavior_label: 'Insufficient Data', subcat_behavior_readable: 'Single Order - Services - Insufficient Data' },
+            { customer_id: 6877209886958, customer_brand_persona: 'Frequent Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Pharmacy', category_behavior_label: 'Brand Switcher', sub_category: 'System-wise', subcat_behavior_label: 'Brand Switcher', subcat_behavior_readable: 'Multiple Brands - System-wise - Brand Switcher' },
+            { customer_id: 6877209886958, customer_brand_persona: 'Frequent Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Non-Food', category_behavior_label: 'Brand Switcher', sub_category: 'Collar, Leashes, harnesses', subcat_behavior_label: 'Brand Loyal', subcat_behavior_readable: 'Skatrs - Collar, Leashes, harnesses - Brand Loyal' }
+        ];
+
+        // Color mapping for behavior labels
+        const behaviorColors = {
+            "Brand Loyal": "#4CAF50", // Green
+            "Frequent Brand Switcher": "#F44336", // Red
+            "Brand Switcher": "#FFC107", // Orange/Amber
+            "Insufficient Data": "#9E9E9E", // Grey
+            "Category Explorer": "#2196F3", // Blue for general categories or affinity
+            "Frequent Brand Switcher (Customer)": "#E53935", // Darker red for overall customer persona
+            "Default": "#BBDEFB" // Light blue for nodes without specific behavior label
+        };
+
+        // Function to transform flat data into hierarchical structure
+        function buildHierarchy(data) {
+            const hierarchy = {
+                name: String(data[0].customer_id),
+                behavior: data[0].customer_brand_persona, // Top-level customer behavior
+                children: []
+            };
+
+            const categoriesMap = new Map();
+
+            data.forEach(d => {
+                let categoryNode = categoriesMap.get(d.category);
+                if (!categoryNode) {
+                    categoryNode = {
+                        name: d.category,
+                        behavior: d.category_behavior_label || 'Category Explorer', // Use category behavior, default if missing
+                        children: []
+                    };
+                    hierarchy.children.push(categoryNode);
+                    categoriesMap.set(d.category, categoryNode);
+                }
+
+                // Add sub-category to the category's children
+                categoryNode.children.push({
+                    name: d.sub_category,
+                    behavior: d.subcat_behavior_label,
+                    readable_behavior: d.subcat_behavior_readable // For tooltip
+                });
+            });
+
+            return hierarchy;
+        }
+
+        // Initialize and render the chart
+        window.onload = function() {
+            renderChart();
+            window.addEventListener('resize', renderChart); // Make responsive
+        };
+
+        let i = 0; // Counter for node IDs
+        let duration = 750; // Transition duration
+
+        function renderChart() {
+            // Clear existing SVG content
+            d3.select(".tree-svg").selectAll("*").remove();
+
+            const containerWidth = d3.select(".chart-container").node().getBoundingClientRect().width;
+            const margin = { top: 50, right: 90, bottom: 50, left: 90 }; // Increased top margin for title
+            const width = Math.min(containerWidth - margin.left - margin.right, 900);
+            let height = 600; // Initial height, will be adjusted dynamically
+
+            const svg = d3.select(".tree-svg")
+                .attr("width", width + margin.right + margin.left)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            // Tooltip div
+            const tooltip = d3.select("body").append("div")
+                .attr("class", "tooltip");
+
+            const treemap = d3.tree().size([height, width]);
+
+            // Build hierarchy from raw data
+            const rootData = buildHierarchy(rawData);
+            let root = d3.hierarchy(rootData, d => d.children);
+            root.x0 = height / 2;
+            root.y0 = 0;
+
+            // Collapse after the first level
+            if (root.children) {
+                root.children.forEach(collapse);
+            }
+
+            update(root);
+
+            // Toggle children on click.
+            function click(event, d) {
+                if (d.children) {
+                    d._children = d.children;
+                    d.children = null;
+                } else {
+                    d.children = d._children;
+                    d._children = null;
+                }
+                update(d);
+            }
+
+            function update(source) {
+                // Assigns the x and y position for the nodes
+                const treeData = treemap(root);
+
+                // Compute the new tree layout.
+                const nodes = treeData.descendants();
+                const links = treeData.descendants().slice(1);
+
+                // Normalize for fixed-depth.
+                nodes.forEach(d => { d.y = d.depth * 180; }); // Adjust node spacing horizontally
+
+                // ****************** Nodes section ******************
+
+                // Update the nodes...
+                const node = svg.selectAll('g.node')
+                    .data(nodes, d => d.id || (d.id = ++i));
+
+                // Enter any new nodes at the parent's previous position.
+                const nodeEnter = node.enter().append('g')
+                    .attr('class', 'node')
+                    .attr('transform', d => `translate(${source.y0},${source.x0})`)
+                    .on('click', click)
+                    .on("mouseover", (event, d) => {
+                        tooltip.transition()
+                            .duration(200)
+                            .style("opacity", .9);
+                        let content = `<b>${d.data.name}</b><br/>`;
+                        if (d.depth === 0) {
+                            content += `Customer Persona: ${d.data.behavior}`;
+                        } else if (d.depth === 1) {
+                            content += `Category Behavior: ${d.data.behavior}`;
+                        } else if (d.depth === 2) {
+                            content += `Sub-Category Behavior: ${d.data.readable_behavior || d.data.behavior}`;
+                        }
+                        tooltip.html(content)
+                            .style("left", (event.pageX + 10) + "px")
+                            .style("top", (event.pageY - 28) + "px");
+                    })
+                    .on("mouseout", () => {
+                        tooltip.transition()
+                            .duration(500)
+                            .style("opacity", 0);
+                    });
+
+                // Add Circle for the nodes
+                nodeEnter.append('circle')
+                    .attr('class', 'node circle')
+                    .attr('r', 1e-6)
+                    .style("fill", d => {
+                        if (d.depth === 0) return behaviorColors[d.data.behavior] || behaviorColors["Frequent Brand Switcher (Customer)"];
+                        if (d.depth === 1) return behaviorColors[d.data.behavior] || behaviorColors['Category Explorer'];
+                        if (d.depth === 2) return behaviorColors[d.data.behavior] || behaviorColors.Default;
+                        return d._children ? "lightsteelblue" : "#fff";
+                    });
+
+                // Add labels for the nodes
+                nodeEnter.append('text')
+                    .attr('dy', '.35em')
+                    .attr('x', d => d.children || d._children ? -13 : 13)
+                    .attr('text-anchor', d => d.children || d._children ? 'end' : 'start')
+                    .text(d => d.data.name);
+
+                // UPDATE
+                const nodeUpdate = nodeEnter.merge(node);
+
+                // Transition to the proper position for the node
+                nodeUpdate.transition()
+                    .duration(duration)
+                    .attr('transform', d => `translate(${d.y},${d.x})`);
+
+                // Update the node attributes and style
+                nodeUpdate.select('circle.node')
+                    .attr('r', 10)
+                    .style("fill", d => {
+                        if (d.depth === 0) return behaviorColors[d.data.behavior] || behaviorColors["Frequent Brand Switcher (Customer)"];
+                        if (d.depth === 1) return behaviorColors[d.data.behavior] || behaviorColors['Category Explorer'];
+                        if (d.depth === 2) return behaviorColors[d.data.behavior] || behaviorColors.Default;
+                        return d._children ? "lightsteelblue" : "#fff";
+                    })
+                    .attr('stroke', 'steelblue')
+                    .attr('stroke-width', '3px');
+
+
+                // Remove any exiting nodes
+                const nodeExit = node.exit().transition()
+                    .duration(duration)
+                    .attr('transform', d => `translate(${source.y},${source.x})`)
+                    .remove();
+
+                // On exit reduce the node circles size to 0
+                nodeExit.select('circle')
+                    .attr('r', 1e-6);
+
+                // On exit reduce the opacity of text labels
+                nodeExit.select('text')
+                    .style('fill-opacity', 1e-6);
+
+                // ****************** Links section ******************
+
+                // Update the links...
+                const link = svg.selectAll('path.link')
+                    .data(links, d => d.id);
+
+                // Enter any new links at the parent's previous position.
+                const linkEnter = link.enter().insert('path', "g")
+                    .attr("class", "link")
+                    .attr('d', d => {
+                        const o = { x: source.x0, y: source.y0 };
+                        return diagonal(o, o);
+                    });
+
+                // UPDATE
+                const linkUpdate = linkEnter.merge(link);
+
+                // Transition back to the new position
+                linkUpdate.transition()
+                    .duration(duration)
+                    .attr('d', d => diagonal(d, d.parent));
+
+                // Remove any exiting links
+                link.exit().transition()
+                    .duration(duration)
+                    .attr('d', d => {
+                        const o = { x: source.x, y: source.y };
+                        return diagonal(o, o);
+                    })
+                    .remove();
+
+                // Store the old positions for transition.
+                nodes.forEach(d => {
+                    d.x0 = d.x;
+                    d.y0 = d.y;
+                });
+
+                // Function to draw the path between nodes
+                function diagonal(s, d) {
+                    return `M ${s.y} ${s.x}
+                            C ${(s.y + d.y) / 2} ${s.x},
+                              ${(s.y + d.y) / 2} ${d.x},
+                              ${d.y} ${d.x}`;
+                }
+
+                // Dynamically adjust SVG height based on tree extent
+                const treeHeight = root.descendants().reduce((max, d) => Math.max(max, d.x), 0) -
+                                 root.descendants().reduce((min, d) => Math.min(min, d.x), 0);
+                
+                // Add some padding to the calculated height
+                const newHeight = treeHeight + margin.top + margin.bottom + 50; 
+                d3.select(".tree-svg").attr("height", newHeight);
+                treemap.size([treeHeight + 50, width]); // Adjust tree layout size too
+            }
+
+            // Collapse the node and all its children
+            function collapse(d) {
+                if (d.children) {
+                    d._children = d.children;
+                    d._children.forEach(collapse);
+                    d.children = null;
+                }
+            }
+
+            // Function to download the chart as an image
+            function downloadChartAsImage(format) {
+                const svgElement = d3.select(".tree-svg").node();
+                const svgClone = svgElement.cloneNode(true); // Clone the SVG to avoid modifying the live one
+                const svgStyle = getComputedStyle(svgElement);
+                const bgColor = svgStyle.backgroundColor || '#ffffff'; // Get SVG background color
+
+                // Inline styles from the current SVG and its children
+                function inlineStyles(element) {
+                    const computedStyle = getComputedStyle(element);
+                    let style = '';
+                    for (let i = 0; i < computedStyle.length; i++) {
+                        const prop = computedStyle[i];
+                        // Only include properties that are explicitly set or important for rendering
+                        if (computedStyle.getPropertyValue(prop) && !['width', 'height', 'margin', 'padding'].includes(prop)) {
+                             style += `${prop}: ${computedStyle.getPropertyValue(prop)};`;
+                        }
+                    }
+                    element.setAttribute('style', style);
+
+                    // Recursively inline styles for children
+                    Array.from(element.children).forEach(child => inlineStyles(child));
+                }
+
+                // Apply inline styles to the cloned SVG
+                inlineStyles(svgClone);
+
+                // Add XML declaration and DOCTYPE for proper rendering in external tools
+                const svgString = new XMLSerializer().serializeToString(svgClone);
+                const encodedSvg = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+
+                const canvas = document.createElement("canvas");
+                const context = canvas.getContext("2d");
+
+                const svgRect = svgElement.getBoundingClientRect();
+                const scaleFactor = 2; // Increased scale factor for higher quality
+                canvas.width = svgRect.width * scaleFactor;
+                canvas.height = svgRect.height * scaleFactor;
+                
+                context.scale(scaleFactor, scaleFactor);
+
+                const image = new Image();
+                image.onload = function() {
+                    // Fill background with white or the SVG's background color
+                    context.fillStyle = bgColor;
+                    context.fillRect(0, 0, canvas.width / scaleFactor, canvas.height / scaleFactor);
+                    context.drawImage(image, 0, 0);
+
+                    const link = document.createElement("a");
+                    link.download = `customer_tree_chart.${format}`;
+                    link.href = canvas.toDataURL(`image/${format}`, 0.9); // 0.9 quality for JPG
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                };
+                image.onerror = function(error) {
+                    console.error("Error loading SVG image for download:", error);
+                    // Fallback or user notification
+                };
+                image.src = encodedSvg;
+            }
+
+            // Function to generate AI insights using Gemini API
+            async function getLLMInsight() {
+                const aiInsightOutput = document.getElementById('aiInsightOutput');
+                aiInsightOutput.innerHTML = '<div class="loading-spinner"></div><p class="text-center mt-2">Generating insight...</p>';
+
+                const customerId = rawData[0].customer_id;
+                const customerPersona = rawData[0].customer_brand_persona;
+
+                let behaviorDetails = `Customer ID: ${customerId}\nOverall Persona: ${customerPersona}\n\nCategory and Sub-category Behaviors:\n`;
+                const categories = new Map();
+                rawData.forEach(item => {
+                    if (!categories.has(item.category)) {
+                        categories.set(item.category, { behavior: item.category_behavior_label, subcategories: [] });
+                    }
+                    categories.get(item.category).subcategories.push({
+                        name: item.sub_category,
+                        behavior: item.subcat_behavior_label,
+                        readable: item.subcat_behavior_readable
+                    });
+                });
+
+                categories.forEach((cat, categoryName) => {
+                    behaviorDetails += `- Category: ${categoryName} (Behavior: ${cat.behavior})\n`;
+                    cat.subcategories.forEach(subcat => {
+                        behaviorDetails += `  - Sub-category: ${subcat.name} (Behavior: ${subcat.behavior} - ${subcat.readable})\n`;
+                    });
+                });
+
+                const prompt = `Analyze the following customer behavior data and provide a concise summary of their purchasing patterns. Then, suggest 2-3 actionable business recommendations based on their behavior to improve retention or engagement.
+                
+                Customer Data:\n${behaviorDetails}`;
+
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                const payload = { contents: chatHistory };
+                const apiKey = ""; // Leave as-is, Canvas will inject at runtime
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const result = await response.json();
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const text = result.candidates[0].content.parts[0].text;
+                        aiInsightOutput.innerHTML = `<h3 class="text-lg font-semibold mb-2">AI Insight:</h3><p>${text}</p>`;
+                    } else {
+                        aiInsightOutput.innerHTML = `<h3 class="text-lg font-semibold mb-2">AI Insight:</h3><p class="text-red-600">Failed to generate insight. Please try again.</p>`;
+                        console.error('Gemini API response structure unexpected:', result);
+                    }
+                } catch (error) {
+                    aiInsightOutput.innerHTML = `<h3 class="text-lg font-semibold mb-2">AI Insight:</h3><p class="text-red-600">Error fetching AI insight: ${error.message}</p>`;
+                    console.error('Error calling Gemini API:', error);
+                }
+            }
+
+            // Make the LLM insight function globally accessible
+            window.getLLMInsight = getLLMInsight;
+        }
+    </script>
+</body>
+</html>
