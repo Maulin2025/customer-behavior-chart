@@ -189,18 +189,16 @@
     <script>
         // Sample customer data (replace with your actual data source)
         const rawData = [
-            { customer_id: 6877209886958, customer_brand_persona: 'Frequent Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Food', category_behavior_label: 'Frequent Brand Switcher', sub_category: 'Treats', subcat_behavior_label: 'Brand Switcher', subcat_behavior_readable: 'Multiple Brands - Treats - Brand Switcher' },
-            { customer_id: 6877209886958, customer_brand_persona: 'Frequent Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Rewards', category_behavior_label: 'Brand Switcher', sub_category: 'Wet Food', subcat_behavior_label: 'Insufficient Data', subcat_behavior_readable: 'Single Order - Wet Food - Insufficient Data' },
-            { customer_id: 6877209886958, customer_brand_persona: 'Frequent Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Non-Food', category_behavior_label: 'Brand Switcher', sub_category: 'Toys', subcat_behavior_label: 'Brand Switcher', subcat_behavior_readable: 'Multiple Brands - Toys - Brand Switcher' },
-            { customer_id: 6877209886958, customer_brand_persona: 'Frequent Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Non-Food', category_behavior_label: 'Brand Switcher', sub_category: 'Clothing & Accessories', subcat_behavior_label: 'Insufficient Data', subcat_behavior_readable: 'Single Order - Clothing & Accessories - Insufficient Data' },
-            { customer_id: 6877209886958, customer_brand_persona: 'Frequent Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Food', category_behavior_label: 'Frequent Brand Switcher', sub_category: 'Dry Food', subcat_behavior_label: 'Frequent Brand Switcher', subcat_behavior_readable: 'Multiple Brands - Dry Food - Frequent Brand Switcher' },
-            { customer_id: 6877209886958, customer_brand_persona: 'Frequent Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Non-Food', category_behavior_label: 'Brand Switcher', sub_category: 'Grooming Supplies', subcat_behavior_label: 'Brand Switcher', subcat_behavior_readable: 'Multiple Brands - Grooming Supplies - Brand Switcher' },
-            { customer_id: 6877209886958, customer_brand_persona: 'Frequent Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Non-Food', category_behavior_label: 'Brand Switcher', sub_category: 'Health & Wellness', subcat_behavior_label: 'Brand Switcher', subcat_behavior_readable: 'Multiple Brands - Health & Wellness - Brand Switcher' },
-            { customer_id: 6877209886958, customer_brand_persona: 'Frequent Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Non-Food', category_behavior_label: 'Brand Switcher', sub_category: 'Bowls & Feeders', subcat_behavior_label: 'Insufficient Data', subcat_behavior_readable: 'Single Order - Bowls & Feeders - Insufficient Data' },
-            { customer_id: 6877209886958, customer_brand_persona: 'Frequent Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Food', category_behavior_label: 'Frequent Brand Switcher', sub_category: 'Wet Food', subcat_behavior_label: 'Brand Switcher', subcat_behavior_readable: 'Multiple Brands - Wet Food - Brand Switcher' },
-            { customer_id: 6877209886958, customer_brand_persona: 'Frequent Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Services', category_behavior_label: 'Brand Loyal', sub_category: 'Services', subcat_behavior_label: 'Insufficient Data', subcat_behavior_readable: 'Single Order - Services - Insufficient Data' },
-            { customer_id: 6877209886958, customer_brand_persona: 'Frequent Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Pharmacy', category_behavior_label: 'Brand Switcher', sub_category: 'System-wise', subcat_behavior_label: 'Brand Switcher', subcat_behavior_readable: 'Multiple Brands - System-wise - Brand Switcher' },
-            { customer_id: 6877209886958, customer_brand_persona: 'Frequent Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Non-Food', category_behavior_label: 'Brand Switcher', sub_category: 'Collar, Leashes, harnesses', subcat_behavior_label: 'Brand Loyal', subcat_behavior_readable: 'Skatrs - Collar, Leashes, harnesses - Brand Loyal' }
+            { customer_id: 5736556757165, customer_brand_persona: 'Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Food', category_behavior_label: 'Food Frequent Brand Switcher', sub_category: 'Wet Food', subcat_behavior_label: 'Wet Food Frequent Brand Switcher', subcat_behavior_readable: 'Multiple Brands - Wet Food - Frequent Brand Switcher' },
+            { customer_id: 5736556757165, customer_brand_persona: 'Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Non-Food', category_behavior_label: 'Non-Food Brand Switcher', sub_category: 'Health & Wellness', subcat_behavior_label: 'Health & Wellness Insufficient Data', subcat_behavior_readable: 'Single Order - Health & Wellness - Insufficient Data' },
+            { customer_id: 5736556757165, customer_brand_persona: 'Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Food', category_behavior_label: 'Food Frequent Brand Switcher', sub_category: 'Treats', subcat_behavior_label: 'Treats Brand Switcher', subcat_behavior_readable: 'Multiple Brands - Treats - Brand Switcher' },
+            { customer_id: 5736556757165, customer_brand_persona: 'Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Non-Food', category_behavior_label: 'Non-Food Brand Switcher', sub_category: 'Litter Supplies', subcat_behavior_label: 'Litter Supplies Brand Switcher', subcat_behavior_readable: 'Multiple Brands - Litter Supplies - Brand Switcher' },
+            { customer_id: 5736556757165, customer_brand_persona: 'Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Non-Food', category_behavior_label: 'Non-Food Brand Switcher', sub_category: 'Cats-Litter', subcat_behavior_label: 'Cats-Litter Brand Switcher', subcat_behavior_readable: 'Multiple Brands - Cats-Litter - Brand Switcher' },
+            { customer_id: 5736556757165, customer_brand_persona: 'Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Non-Food', category_behavior_label: 'Non-Food Brand Switcher', sub_category: 'Toys', subcat_behavior_label: 'Toys Brand Switcher', subcat_behavior_readable: 'Multiple Brands - Toys - Brand Switcher' },
+            { customer_id: 5736556757165, customer_brand_persona: 'Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Services', category_behavior_label: 'Services Brand Loyal', sub_category: 'Services', subcat_behavior_label: 'Services Insufficient Data', subcat_behavior_readable: 'Single Order - Services - Insufficient Data' },
+            { customer_id: 5736556757165, customer_brand_persona: 'Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Non-Food', category_behavior_label: 'Non-Food Brand Switcher', sub_category: 'Bedding, Mats & Travel Supplies', subcat_behavior_label: 'Bedding, Mats & Travel Supplies Insufficient Data', subcat_behavior_readable: 'Single Order - Bedding, Mats & Travel Supplies - Insufficient Data' },
+            { customer_id: 5736556757165, customer_brand_persona: 'Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Food', category_behavior_label: 'Food Frequent Brand Switcher', sub_category: 'Dry Food', subcat_behavior_label: 'Dry Food Frequent Brand Switcher', subcat_behavior_readable: 'Multiple Brands - Dry Food - Frequent Brand Switcher' },
+            { customer_id: 5736556757165, customer_brand_persona: 'Brand Switcher', category_affinity_label: 'Category Explorer', category: 'Non-Food', category_behavior_label: 'Non-Food Brand Switcher', sub_category: 'Grooming Supplies', subcat_behavior_label: 'Grooming Supplies Insufficient Data', subcat_behavior_readable: 'Single Order - Grooming Supplies - Insufficient Data' }
         ];
 
         // Color mapping for behavior labels
@@ -210,9 +208,18 @@
             "Brand Switcher": "#FFC107", // Orange/Amber
             "Insufficient Data": "#9E9E9E", // Grey
             "Category Explorer": "#2196F3", // Blue for general categories or affinity
-            "Frequent Brand Switcher (Customer)": "#E53935", // Darker red for overall customer persona
+            "Frequent Brand Switcher (Overall Customer)": "#E53935", // Darker red for overall customer persona
             "Default": "#BBDEFB" // Light blue for nodes without specific behavior label
         };
+        
+        // Fix for new data format: extract the label from the text
+        function getBehaviorLabel(text) {
+            if (text.includes('Brand Loyal')) return "Brand Loyal";
+            if (text.includes('Frequent Brand Switcher')) return "Frequent Brand Switcher";
+            if (text.includes('Brand Switcher')) return "Brand Switcher";
+            if (text.includes('Insufficient Data')) return "Insufficient Data";
+            return "Default";
+        }
 
         // Function to transform flat data into hierarchical structure
         function buildHierarchy(data) {
@@ -247,16 +254,17 @@
             return hierarchy;
         }
 
-        // Initialize and render the chart
-        window.onload = function() {
-            renderChart();
-            window.addEventListener('resize', renderChart); // Make responsive
-        };
-
         let i = 0; // Counter for node IDs
         let duration = 750; // Transition duration
 
+        // Function to initialize and render the chart
         function renderChart() {
+            // Check if rawData is not empty to prevent errors
+            if (!rawData || rawData.length === 0) {
+                console.error("No raw data available to render chart.");
+                return;
+            }
+            
             // Clear existing SVG content
             d3.select(".tree-svg").selectAll("*").remove();
 
@@ -351,11 +359,11 @@
                     .attr('class', 'node circle')
                     .attr('r', 1e-6)
                     .style("fill", d => {
-                        if (d.depth === 0) return behaviorColors[d.data.behavior] || behaviorColors["Frequent Brand Switcher (Customer)"];
-                        if (d.depth === 1) return behaviorColors[d.data.behavior] || behaviorColors['Category Explorer'];
-                        if (d.depth === 2) return behaviorColors[d.data.behavior] || behaviorColors.Default;
-                        return d._children ? "lightsteelblue" : "#fff";
-                    });
+                        const behavior = d.depth === 0 ? d.data.behavior : d.depth === 1 ? getBehaviorLabel(d.data.behavior) : getBehaviorLabel(d.data.behavior);
+                        return behaviorColors[behavior] || "lightsteelblue";
+                    })
+                    .attr('stroke', 'steelblue')
+                    .attr('stroke-width', '3px');
 
                 // Add labels for the nodes
                 nodeEnter.append('text')
@@ -376,10 +384,8 @@
                 nodeUpdate.select('circle.node')
                     .attr('r', 10)
                     .style("fill", d => {
-                        if (d.depth === 0) return behaviorColors[d.data.behavior] || behaviorColors["Frequent Brand Switcher (Customer)"];
-                        if (d.depth === 1) return behaviorColors[d.data.behavior] || behaviorColors['Category Explorer'];
-                        if (d.depth === 2) return behaviorColors[d.data.behavior] || behaviorColors.Default;
-                        return d._children ? "lightsteelblue" : "#fff";
+                        const behavior = d.depth === 0 ? d.data.behavior : d.depth === 1 ? getBehaviorLabel(d.data.behavior) : getBehaviorLabel(d.data.behavior);
+                        return behaviorColors[behavior] || "lightsteelblue";
                     })
                     .attr('stroke', 'steelblue')
                     .attr('stroke-width', '3px');
@@ -547,9 +553,11 @@
                 });
 
                 categories.forEach((cat, categoryName) => {
-                    behaviorDetails += `- Category: ${categoryName} (Behavior: ${cat.behavior})\n`;
+                    const catBehavior = getBehaviorLabel(cat.behavior);
+                    behaviorDetails += `- Category: ${categoryName} (Behavior: ${catBehavior})\n`;
                     cat.subcategories.forEach(subcat => {
-                        behaviorDetails += `  - Sub-category: ${subcat.name} (Behavior: ${subcat.behavior} - ${subcat.readable})\n`;
+                        const subcatBehavior = getBehaviorLabel(subcat.behavior);
+                        behaviorDetails += `  - Sub-category: ${subcat.name} (Behavior: ${subcatBehavior} - ${subcat.readable})\n`;
                     });
                 });
 
@@ -581,12 +589,23 @@
                     }
                 } catch (error) {
                     aiInsightOutput.innerHTML = `<h3 class="text-lg font-semibold mb-2">AI Insight:</h3><p class="text-red-600">Error fetching AI insight: ${error.message}</p>`;
-                    console.error('Error calling Gemini API:', error);
+                        console.error('Error calling Gemini API:', error);
                 }
             }
 
-            // Make the LLM insight function globally accessible
+            // Make the download and LLM insight functions globally accessible
+            window.downloadChartAsImage = downloadChartAsImage;
             window.getLLMInsight = getLLMInsight;
+        }
+
+        // Run renderChart on initial load and resize, but also call it directly for resilience
+        document.addEventListener('DOMContentLoaded', () => {
+            renderChart();
+        });
+        window.addEventListener('resize', renderChart);
+        // Fallback for environments where DOMContentLoaded is not reliable
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            renderChart();
         }
     </script>
 </body>
